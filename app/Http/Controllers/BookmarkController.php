@@ -33,10 +33,18 @@ class BookmarkController extends Controller
         $data = $request->validate([
             "imdbID" => ["required"],
             "poster" => ["string"],
-            "title" => ["string"]
+            "title" => ["string"],
+            "rating" => ["numeric"],
+            "watch_count" => ["numeric"]
         ]);
 
         $data['user_id'] = $request->user()->id;
+
+        $exists = Bookmark::query()->where('user_id', auth()->id())->where('imdbID', $data['imdbID'])->get();
+
+        if ($exists) {
+            return response("bookmark already exist");
+        }
 
         Bookmark::create($data);
 

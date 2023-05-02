@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->string('imdbID');
-            $table->string('poster');
-            $table->string('title');
+            $table->string('poster')->nullable();
+            $table->string('title')->nullable();
+            $table->integer('watch_count')->nullable();
+            $table->float("rating")->nullable();
             $table->timestamps();
         });
     }

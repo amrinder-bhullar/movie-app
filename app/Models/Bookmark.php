@@ -14,6 +14,8 @@ class Bookmark extends Model
         'imdbID',
         'poster',
         'title',
+        'rating',
+        'watch_count',
     ];
 
     public function User()
