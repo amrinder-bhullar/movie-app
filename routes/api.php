@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
     Route::apiResource('/bookmarks', BookmarkController::class);
+    Route::post('/logout', [AuthController::class, 'logout']);
     // Route::get("bookmarks", [BookmarkController::class, 'index']);
 });
 

@@ -40,7 +40,7 @@ class BookmarkController extends Controller
 
         $data['user_id'] = $request->user()->id;
 
-        $exists = Bookmark::query()->where('user_id', auth()->id())->where('imdbID', $data['imdbID'])->get();
+        $exists = Bookmark::query()->where('user_id', auth()->id())->where('imdbID', $data['imdbID'])->exists();
 
         if ($exists) {
             return response("bookmark already exist");
@@ -78,8 +78,9 @@ class BookmarkController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(BookmarkController $bookmarkController)
+    public function destroy(Bookmark $bookmark)
     {
-        //
+        $bookmark->delete();
+        return response('deletef', 201);
     }
 }
