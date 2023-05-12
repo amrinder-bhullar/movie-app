@@ -3,30 +3,34 @@ import "../App.css";
 import axios from "axios";
 import { useStateContext } from "../contexts/ContextProvider";
 import axiosClient from "../axios-client";
+import Paginate from "../components/paginate";
 
 function Search() {
-    const {
-        user,
-        bookmarks,
-        setBookmarks,
-        bookmarksUpdated,
-        setBookmarksUpdated,
-    } = useStateContext();
+    const { bookmarks, bookmarksUpdated, setBookmarksUpdated } =
+        useStateContext();
     const [search, setSearch] = useState("");
     const [movies, setMovies] = useState([]);
     const [SavedbookmarksImdbID, setSavedbookmarksImdbID] = useState([]);
     const [showPopup, setShowPopup] = useState(false);
     const [selectedMovie, setSelectedMovie] = useState({});
+    const [currentSearchPage, setCurrentSearchPage] = useState(1);
+    const [totalResults, setTotalResuls] = useState();
 
     const ratingRef = useRef();
     const numWatchedRef = useRef();
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
+    const getResults = async () => {
         const response = await axios.get(
-            `https://www.omdbapi.com/?s=${search}&&apikey=22396c3c`
+            `https://www.omdbapi.com/?s=${search}&page=${currentSearchPage}&apikey=22396c3c`
         );
         setMovies(response.data.Search);
+        setTotalResuls(response.data.totalResults);
+    };
+
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        setCurrentSearchPage(1);
+        getResults();
     };
 
     const handleRatingSubmit = (e) => {
@@ -64,6 +68,16 @@ function Search() {
         }
     };
 
+    const handleNext = () => {
+        setCurrentSearchPage(currentSearchPage + 1);
+    };
+
+    const handlePrev = () => {
+        if (currentSearchPage > 1) {
+            setCurrentSearchPage(currentSearchPage - 1);
+        }
+    };
+
     useEffect(() => {
         const justImdbIDs = bookmarks.map((bookmark) => {
             return bookmark.imdbID;
@@ -71,6 +85,10 @@ function Search() {
         console.log("bookmarksUpdated + 1");
         setSavedbookmarksImdbID(justImdbIDs);
     }, [bookmarks]);
+
+    useEffect(() => {
+        getResults();
+    }, [currentSearchPage]);
 
     return (
         <>
@@ -113,11 +131,8 @@ function Search() {
                             onSubmit={handleRatingSubmit}
                             className="bg-white py-5 px-5 flex flex-col"
                         >
-                            <div class="mb-6">
-                                <label
-                                    for="rating"
-                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                >
+                            <div className="mb-6">
+                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                                     Rating
                                 </label>
                                 <input
@@ -126,14 +141,11 @@ function Search() {
                                     max="10"
                                     defaultValue="7"
                                     ref={ratingRef}
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 />
                             </div>
-                            <div class="mb-6">
-                                <label
-                                    for="watchedTimes"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                >
+                            <div className="mb-6">
+                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                                     How many times have you watched the movie?
                                 </label>
                                 <input
@@ -141,12 +153,12 @@ function Search() {
                                     min="0"
                                     defaultValue="1"
                                     ref={numWatchedRef}
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 />
                             </div>
                             <button
                                 type="submit"
-                                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                             >
                                 Add to watched list
                             </button>
@@ -159,7 +171,7 @@ function Search() {
                     movies.map((movie) => (
                         <div
                             key={movie.imdbID}
-                            className="h-22 sm:w-2/6 lg:w-1/5 relative"
+                            className="h-22 md:w-2/6 sm:w-5/12 lg:w-3/12 xl:w-1/5 relative"
                         >
                             <button
                                 onClick={() => handleBookmark(movie)}
@@ -185,6 +197,16 @@ function Search() {
                         </div>
                     ))}
             </div>
+            {movies ? (
+                <Paginate
+                    totalResults={totalResults}
+                    currentSearchPage={currentSearchPage}
+                    handleNext={handleNext}
+                    handlePrev={handlePrev}
+                />
+            ) : (
+                ""
+            )}
         </>
     );
 }

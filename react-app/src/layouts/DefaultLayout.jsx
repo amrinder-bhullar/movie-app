@@ -44,7 +44,7 @@ function DefaultLayout() {
             <header className="flex justify-between py-2 px-10">
                 <h4>Movie App</h4>
                 <nav>
-                    <ul className="flex gap-x-1">
+                    <ul className="flex gap-x-3">
                         <li>
                             <Link to="/dashboard">Dashboard</Link>
                         </li>

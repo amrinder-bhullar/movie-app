@@ -14,7 +14,11 @@ class BookmarkController extends Controller
      */
     public function index(Request $request)
     {
-        return Bookmark::query()->where('user_id', auth()->id())->get();
+        return Bookmark::query()
+            ->where('user_id', auth()->id())
+            ->orderBy('created_at', 'DESC')
+            ->get();
+        // ->paginate(10);
     }
 
     /**

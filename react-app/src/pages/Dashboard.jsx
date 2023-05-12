@@ -1,6 +1,7 @@
 import React from "react";
 import { useStateContext } from "../contexts/ContextProvider";
 import axiosClient from "../axios-client";
+import Slider from "../components/slider";
 
 function Dashboard() {
     const { bookmarks, setBookmarks, setBookmarksUpdated, bookmarksUpdated } =
@@ -20,6 +21,7 @@ function Dashboard() {
     return (
         <div className="flex w-full">
             <main className="w-11/12 mx-auto px-4 mb-8">
+                <Slider bookmarks={bookmarks} />
                 {bookmarks &&
                     bookmarks.map((bookmark) => (
                         <div className="flex mt-16" key={bookmark.imdbID}>
